@@ -1,7 +1,6 @@
 package dots
 
 import (
-	"errors"
 	"go/build"
 	"io/ioutil"
 	"os"
@@ -61,33 +60,41 @@ func readDir(dirname string, recurse bool) ([]string, error) {
 	return files, err
 }
 
-func readNestedPackages(root string, current string, recurse bool, files []string) []string {
+func readNestedPackages(root string, current string, recurse bool) (files []string, errs []error) {
 	if strings.HasPrefix(current, root) {
-		pkg, _ := build.Import(current, ".", 0)
-		var pkgFiles []string
-		pkgFiles = append(pkgFiles, pkg.GoFiles...)
-		pkgFiles = append(pkgFiles, pkg.CgoFiles...)
-		pkgFiles = append(pkgFiles, pkg.TestGoFiles...)
-		if pkg.Dir != "." {
-			for i, f := range pkgFiles {
-				pkgFiles[i] = filepath.Join(pkg.Dir, f)
+		pkg, e := build.Import(current, ".", 0)
+		if e != nil {
+			if _, nogo := e.(*build.NoGoError); !nogo {
+				errs = append(errs, e)
 			}
+		} else {
+			var pkgFiles []string
+			pkgFiles = append(pkgFiles, pkg.GoFiles...)
+			pkgFiles = append(pkgFiles, pkg.CgoFiles...)
+			pkgFiles = append(pkgFiles, pkg.TestGoFiles...)
+			if pkg.Dir != "." {
+				for i, f := range pkgFiles {
+					pkgFiles[i] = filepath.Join(pkg.Dir, f)
+				}
+			}
+			files = append(files, pkgFiles...)
 		}
-		files = append(files, pkgFiles...)
 		if recurse {
 			for _, i := range pkg.Imports {
-				files = append(files, readNestedPackages(root, i, recurse, files)...)
+				fls, e := readNestedPackages(root, i, recurse)
+				files = append(files, fls...)
+				errs = append(errs, e...)
 			}
 		}
 	}
-	return files
+	return files, errs
 }
 
-func readPackage(packageName string, recurse bool) []string {
-	return readNestedPackages(packageName, packageName, recurse, []string{})
+func readPackage(packageName string, recurse bool) ([]string, []error) {
+	return readNestedPackages(packageName, packageName, recurse)
 }
 
-func resolvePattern(pattern string) ([]string, error) {
+func resolvePattern(pattern string) ([]string, []error) {
 	recurse := false
 	if strings.HasSuffix(pattern, "/...") {
 		recurse = true
@@ -96,14 +103,18 @@ func resolvePattern(pattern string) ([]string, error) {
 	if isDir(pattern) {
 		abs, err := filepath.Abs(pattern)
 		if err != nil {
-			return nil, err
+			return nil, []error{err}
 		}
-		return readDir(abs, recurse)
+		res, err := readDir(abs, recurse)
+		if err != nil {
+			return res, []error{err}
+		}
+		return res, nil
 	}
 	if isFile(pattern) {
 		return []string{pattern}, nil
 	}
-	return readPackage(pattern, recurse), nil
+	return readPackage(pattern, recurse)
 }
 
 func resolvePatterns(patterns []string) ([]string, []error) {
@@ -112,7 +123,7 @@ func resolvePatterns(patterns []string) ([]string, []error) {
 	for _, s := range patterns {
 		res, err := resolvePattern(s)
 		if err != nil {
-			errs = append(errs, errors.New(`unable to resolve "`+s+`": `+err.Error()))
+			errs = append(errs, err...)
 		} else {
 			paths = append(paths, res...)
 		}

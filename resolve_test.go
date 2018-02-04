@@ -170,3 +170,19 @@ func TestPackageWildcardWithSkip(t *testing.T) {
 		}
 	}
 }
+
+func TestComplainForMissingDirectories(t *testing.T) {
+	_, err := Resolve([]string{"./fixturess"}, []string{})
+
+	if err == nil {
+		t.Error("Should get an error")
+	}
+}
+
+func TestComplainForMissingPackages(t *testing.T) {
+	_, err := Resolve([]string{"github.com/mgechev/bazbaz"}, []string{})
+
+	if err == nil {
+		t.Error("Should get an error")
+	}
+}

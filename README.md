@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/mgechev/dots.svg?branch=master)](https://travis-ci.org/mgechev/dots)
+
 # Dots
 
 Implements the wildcard file matching in Go used by golint, go test etc.

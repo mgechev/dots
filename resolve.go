@@ -13,10 +13,6 @@ import (
 // The final result is the set of all files from the selected directories subtracted with
 // the files in the skip slice.
 func Resolve(includePatterns, skipPatterns []string) ([]string, []error) {
-	if len(includePatterns) == 0 {
-		return []string{"."}, nil
-	}
-
 	skip, errs := resolvePatterns(skipPatterns)
 	filter := newPathFilter(skip)
 
@@ -59,7 +55,7 @@ func readDir(dirname string, recurse bool) ([]string, error) {
 	res, err := ioutil.ReadDir(dirname)
 	if err == nil {
 		for _, f := range res {
-			appendFile(f.Name(), f, nil)
+			appendFile(filepath.Join(dirname, f.Name()), f, nil)
 		}
 	}
 	return files, err
@@ -68,9 +64,16 @@ func readDir(dirname string, recurse bool) ([]string, error) {
 func readNestedPackages(root string, current string, recurse bool, files []string) []string {
 	if strings.HasPrefix(current, root) {
 		pkg, _ := build.Import(current, ".", 0)
-		files = append(files, pkg.GoFiles...)
-		files = append(files, pkg.CgoFiles...)
-		files = append(files, pkg.TestGoFiles...)
+		var pkgFiles []string
+		pkgFiles = append(pkgFiles, pkg.GoFiles...)
+		pkgFiles = append(pkgFiles, pkg.CgoFiles...)
+		pkgFiles = append(pkgFiles, pkg.TestGoFiles...)
+		if pkg.Dir != "." {
+			for i, f := range pkgFiles {
+				pkgFiles[i] = filepath.Join(pkg.Dir, f)
+			}
+		}
+		files = append(files, pkgFiles...)
 		if recurse {
 			for _, i := range pkg.Imports {
 				files = append(files, readNestedPackages(root, i, recurse, files)...)
@@ -91,7 +94,11 @@ func resolvePattern(pattern string) ([]string, error) {
 		pattern = strings.Replace(pattern, "/...", "", 1)
 	}
 	if isDir(pattern) {
-		return readDir(pattern, recurse)
+		abs, err := filepath.Abs(pattern)
+		if err != nil {
+			return nil, err
+		}
+		return readDir(abs, recurse)
 	}
 	if isFile(pattern) {
 		return []string{pattern}, nil

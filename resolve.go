@@ -9,6 +9,31 @@ import (
 	"strings"
 )
 
+// Resolve accepts a slice of paths with optional "..." placeholder and a slice with paths to be skipped.
+// The final result is the set of all files from the selected directories subtracted with
+// the files in the skip slice.
+func Resolve(includePatterns, skipPatterns []string) ([]string, []error) {
+	if len(includePatterns) == 0 {
+		return []string{"."}, nil
+	}
+
+	skip, errs := resolvePatterns(skipPatterns)
+	filter := newPathFilter(skip)
+
+	pathSet := map[string]bool{}
+	include, includeErrs := resolvePatterns(includePatterns)
+	errs = append(errs, includeErrs...)
+
+	var result []string
+	for _, i := range include {
+		if _, ok := pathSet[i]; !ok && !filter(i) {
+			pathSet[i] = true
+			result = append(result, i)
+		}
+	}
+	return result, errs
+}
+
 func isDir(filename string) bool {
 	fi, err := os.Stat(filename)
 	return err == nil && fi.IsDir()
@@ -86,31 +111,6 @@ func resolvePatterns(patterns []string) ([]string, []error) {
 		}
 	}
 	return paths, errs
-}
-
-// Resolve accepts a slice of paths with optional "..." placeholder and a slice with paths to be skipped.
-// The final result is the set of all files from the selected directories subtracted with
-// the files in the skip slice.
-func Resolve(includePatterns, skipPatterns []string) ([]string, []error) {
-	if len(includePatterns) == 0 {
-		return []string{"."}, nil
-	}
-
-	skip, errs := resolvePatterns(skipPatterns)
-	filter := newPathFilter(skip)
-
-	pathSet := map[string]bool{}
-	include, includeErrs := resolvePatterns(includePatterns)
-	errs = append(errs, includeErrs...)
-
-	var result []string
-	for _, i := range include {
-		if _, ok := pathSet[i]; !ok && !filter(i) {
-			pathSet[i] = true
-			result = append(result, i)
-		}
-	}
-	return result, errs
 }
 
 func newPathFilter(skip []string) func(string) bool {

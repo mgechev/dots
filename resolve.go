@@ -40,13 +40,23 @@ func readDir(dirname string, recurse bool) ([]string, error) {
 	return files, err
 }
 
-func readPackage(packageName string) []string {
-	pkg, _ := build.Import(packageName, ".", 0)
-	var files []string
-	files = append(files, pkg.GoFiles...)
-	files = append(files, pkg.CgoFiles...)
-	files = append(files, pkg.TestGoFiles...)
+func readNestedPackages(root string, current string, recurse bool, files []string) []string {
+	if strings.HasPrefix(current, root) {
+		pkg, _ := build.Import(current, ".", 0)
+		files = append(files, pkg.GoFiles...)
+		files = append(files, pkg.CgoFiles...)
+		files = append(files, pkg.TestGoFiles...)
+		if recurse {
+			for _, i := range pkg.Imports {
+				files = append(files, readNestedPackages(root, i, recurse, files)...)
+			}
+		}
+	}
 	return files
+}
+
+func readPackage(packageName string, recurse bool) []string {
+	return readNestedPackages(packageName, packageName, recurse, []string{})
 }
 
 func resolvePattern(pattern string) ([]string, error) {
@@ -61,7 +71,7 @@ func resolvePattern(pattern string) ([]string, error) {
 	if isFile(pattern) {
 		return []string{pattern}, nil
 	}
-	return readPackage(pattern), nil
+	return readPackage(pattern, recurse), nil
 }
 
 func resolvePatterns(patterns []string) ([]string, []error) {

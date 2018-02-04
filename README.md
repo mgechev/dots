@@ -44,6 +44,13 @@ fixtures/baz/baz2.go
 fixtures/baz/baz3.go
 ```
 
+`dots` supports wildcard in both - the first and the last argument of `Resolve`, which means that you can ignore files based on a wildcard:
+
+```go
+dots.Resolve([]string{"github.com/mgechev/dots"}, []string{"./..."}) // empty list
+dots.Resolve([]string{"./fixtures/bar/..."}, []string{"./fixture/foo/...", "./fixtures/baz/..."}) // bar1.go, bar2.go
+```
+
 ## License
 
 MIT

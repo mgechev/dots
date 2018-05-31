@@ -1,6 +1,7 @@
 package dots
 
 import (
+	"fmt"
 	"log"
 	"strings"
 	"testing"
@@ -39,6 +40,7 @@ func TestResolve(t *testing.T) {
 		t.Error("Got errors")
 	}
 
+	fmt.Println(len(result))
 	if len(result) != len(files) {
 		t.Error("Matched different number of files")
 	}
@@ -108,7 +110,6 @@ func TestSkipWildcard(t *testing.T) {
 
 func TestPackageWildcard(t *testing.T) {
 	result, err := Resolve([]string{"github.com/mgechev/dots/fixtures/pkg/foo/...", "github.com/mgechev/dots/fixtures/pkg/baz"}, []string{})
-
 	files := []string{
 		"baz1.go",
 		"baz2.go",

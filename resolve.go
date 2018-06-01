@@ -17,18 +17,27 @@ var (
 	gorootSrc    = filepath.Join(goroot, "src")
 )
 
+func flatten(arr [][]string) []string {
+	var res []string
+	for _, e := range arr {
+		res = append(res, e...)
+	}
+	return res
+}
+
 // Resolve accepts a slice of paths with optional "..." placeholder and a slice with paths to be skipped.
 // The final result is the set of all files from the selected directories subtracted with
 // the files in the skip slice.
 func Resolve(includePatterns, skipPatterns []string) ([]string, error) {
 	skip, err := resolvePatterns(skipPatterns)
-	filter := newPathFilter(skip)
+	filter := newPathFilter(flatten(skip))
 	if err != nil {
 		return nil, err
 	}
 
 	pathSet := map[string]bool{}
-	include, err := resolvePatterns(includePatterns)
+	includePackages, err := resolvePatterns(includePatterns)
+	include := flatten(includePackages)
 	if err != nil {
 		return nil, err
 	}
@@ -39,6 +48,37 @@ func Resolve(includePatterns, skipPatterns []string) ([]string, error) {
 			pathSet[i] = true
 			result = append(result, i)
 		}
+	}
+	return result, err
+}
+
+// ResolvePackages accepts a slice of paths with optional "..." placeholder and a slice with paths to be skipped.
+// The final result is the set of all files from the selected directories subtracted with
+// the files in the skip slice. The difference between `Resolve` and `ResolvePackages`
+// is that `ResolvePackages` preserves the package structure in the nested slices.
+func ResolvePackages(includePatterns, skipPatterns []string) ([][]string, error) {
+	skip, err := resolvePatterns(skipPatterns)
+	filter := newPathFilter(flatten(skip))
+	if err != nil {
+		return nil, err
+	}
+
+	pathSet := map[string]bool{}
+	include, err := resolvePatterns(includePatterns)
+	if err != nil {
+		return nil, err
+	}
+
+	var result [][]string
+	for _, p := range include {
+		var packageFiles []string
+		for _, f := range p {
+			if _, ok := pathSet[f]; !ok && !filter(f) {
+				pathSet[f] = true
+				packageFiles = append(packageFiles, f)
+			}
+		}
+		result = append(result, packageFiles)
 	}
 	return result, err
 }
@@ -84,8 +124,8 @@ func resolveImportedPackage(pkg *build.Package, err error) ([]string, error) {
 	return files, nil
 }
 
-func resolvePatterns(patterns []string) ([]string, error) {
-	var files []string
+func resolvePatterns(patterns []string) ([][]string, error) {
+	var files [][]string
 	for _, pattern := range patterns {
 		f, err := resolvePattern(pattern)
 		if err != nil {
@@ -96,7 +136,7 @@ func resolvePatterns(patterns []string) ([]string, error) {
 	return files, nil
 }
 
-func resolvePattern(pattern string) ([]string, error) {
+func resolvePattern(pattern string) ([][]string, error) {
 	// dirsRun, filesRun, and pkgsRun indicate whether golint is applied to
 	// directory, file or package targets. The distinction affects which
 	// checks are run. It is no valid to mix target types.
@@ -119,7 +159,7 @@ func resolvePattern(pattern string) ([]string, error) {
 		matches = append(matches, pattern)
 	}
 
-	var result []string
+	result := [][]string{}
 	switch {
 	case dirsRun == 1:
 		for _, dir := range matches {
@@ -127,17 +167,17 @@ func resolvePattern(pattern string) ([]string, error) {
 			if err != nil {
 				return nil, err
 			}
-			result = append(result, res...)
+			result = append(result, res)
 		}
 	case filesRun == 1:
-		return matches, nil
+		return [][]string{matches}, nil
 	case pkgsRun == 1:
 		for _, pkg := range importPaths(matches) {
 			res, err := resolvePackage(pkg)
 			if err != nil {
 				return nil, err
 			}
-			result = append(result, res...)
+			result = append(result, res)
 		}
 	}
 	return result, nil

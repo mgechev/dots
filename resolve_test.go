@@ -187,3 +187,22 @@ func TestComplainForMissingPackages(t *testing.T) {
 		t.Error("Should get an error")
 	}
 }
+
+func TestResolvePackages(t *testing.T) {
+	result, err := ResolvePackages([]string{"github.com/mgechev/dots/fixtures/pkg/foo/...", "github.com/mgechev/dots/fixtures/pkg/baz"}, []string{})
+
+	if err != nil {
+		t.Error("Got errors")
+	}
+
+	if len(result) != 3 {
+		t.Error("Matched different number of files")
+	}
+
+	for _, pkg := range result {
+		if len(pkg) == 0 {
+			t.Error("Empty package")
+		}
+	}
+
+}

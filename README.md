@@ -66,13 +66,18 @@ So we will get the result:
 ```text
 [
   [
-    "$GOROOT/src/github.com/mgechev/dots/fixtures/dummy/bar/bar1.go","$GOROOT/src/github.com/mgechev/dots/fixtures/dummy/bar/bar2.go"
+    "$GOROOT/src/github.com/mgechev/dots/fixtures/dummy/bar/bar1.go",
+    "$GOROOT/src/github.com/mgechev/dots/fixtures/dummy/bar/bar2.go"
   ],
   [
-    "$GOROOT/src/github.com/mgechev/dots/fixtures/dummy/baz/baz1.go","$GOROOT/src/github.com/mgechev/dots/fixtures/dummy/baz/baz2.go","$GOROOT/src/github.com/mgechev/dots/fixtures/dummy/baz/baz3.go"
+    "$GOROOT/src/github.com/mgechev/dots/fixtures/dummy/baz/baz1.go",
+    "$GOROOT/src/github.com/mgechev/dots/fixtures/dummy/baz/baz2.go",
+    "$GOROOT/src/github.com/mgechev/dots/fixtures/dummy/baz/baz3.go"
   ],
   [
-    "$GOROOT/src/github.com/mgechev/dots/fixtures/dummy/foo/foo1.go","$GOROOT/src/github.com/mgechev/dots/fixtures/dummy/foo/foo2.go","$GOROOT/src/github.com/mgechev/dots/fixtures/dummy/foo/foo3.go"
+    "$GOROOT/src/github.com/mgechev/dots/fixtures/dummy/foo/foo1.go",
+    "$GOROOT/src/github.com/mgechev/dots/fixtures/dummy/foo/foo2.go",
+    "$GOROOT/src/github.com/mgechev/dots/fixtures/dummy/foo/foo3.go"
   ],
   [
     "$GOROOT/src/github.com/mgechev/dots/fixtures/pkg/baz/baz1.go",

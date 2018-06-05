@@ -53,6 +53,43 @@ dots.Resolve([]string{"github.com/mgechev/dots"}, []string{"./..."}) // empty li
 dots.Resolve([]string{"./fixtures/bar/..."}, []string{"./fixture/foo/...", "./fixtures/baz/..."}) // bar1.go, bar2.go
 ```
 
+## Preserve package structure
+
+`dots` allow you to receive a slice of slices where each nested slice represents an individual package:
+
+```go
+dots.ResolvePackages([]string{"github.com/mgechev/dots/..."}, []string{})
+```
+
+So we will get the result:
+
+```text
+[
+  [
+    "$GOROOT/src/github.com/mgechev/dots/fixtures/dummy/bar/bar1.go","$GOROOT/src/github.com/mgechev/dots/fixtures/dummy/bar/bar2.go"
+  ],
+  [
+    "$GOROOT/src/github.com/mgechev/dots/fixtures/dummy/baz/baz1.go","$GOROOT/src/github.com/mgechev/dots/fixtures/dummy/baz/baz2.go","$GOROOT/src/github.com/mgechev/dots/fixtures/dummy/baz/baz3.go"
+  ],
+  [
+    "$GOROOT/src/github.com/mgechev/dots/fixtures/dummy/foo/foo1.go","$GOROOT/src/github.com/mgechev/dots/fixtures/dummy/foo/foo2.go","$GOROOT/src/github.com/mgechev/dots/fixtures/dummy/foo/foo3.go"
+  ],
+  [
+    "$GOROOT/src/github.com/mgechev/dots/fixtures/pkg/baz/baz1.go",
+    "$GOROOT/src/github.com/mgechev/dots/fixtures/pkg/baz/baz2.go"
+  ],
+  [
+    "$GOROOT/src/github.com/mgechev/dots/fixtures/pkg/foo/foo1.go",
+    "$GOROOT/src/github.com/mgechev/dots/fixtures/pkg/foo/foo2.go"
+  ],
+  [
+    "$GOROOT/src/github.com/mgechev/dots/fixtures/pkg/foo/bar/bar1.go"
+  ]
+]
+```
+
+This method is especially useful, when you want to perform type checking ovr given package from the result.
+
 ## License
 
 MIT

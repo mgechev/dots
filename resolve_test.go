@@ -1,7 +1,6 @@
 package dots
 
 import (
-	"fmt"
 	"log"
 	"strings"
 	"testing"
@@ -40,7 +39,6 @@ func TestResolve(t *testing.T) {
 		t.Error("Got errors")
 	}
 
-	fmt.Println(len(result))
 	if len(result) != len(files) {
 		t.Error("Matched different number of files")
 	}

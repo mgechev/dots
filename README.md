@@ -93,7 +93,7 @@ So we will get the result:
 ]
 ```
 
-This method is especially useful, when you want to perform type checking ovr given package from the result.
+This method is especially useful, when you want to perform type checking over given package from the result.
 
 ## License
 

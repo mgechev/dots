@@ -25,7 +25,7 @@ func TestResolveNoArgs(t *testing.T) {
 }
 
 func TestResolve(t *testing.T) {
-	result, err := Resolve([]string{"fixtures/dummy/..."}, []string{"fixtures/dummy/foo"})
+	result, err := Resolve([]string{"fixtures/dummy/..."}, []string{"fixtures/dummy/foo", "fixtures/dummy/UNKNOWN"})
 
 	files := []string{
 		"fixtures/dummy/bar/bar1.go",

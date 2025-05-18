@@ -116,6 +116,7 @@ func resolveImportedPackage(pkg *build.Package, err error) ([]string, error) {
 	files = append(files, pkg.GoFiles...)
 	files = append(files, pkg.CgoFiles...)
 	files = append(files, pkg.TestGoFiles...)
+	files = append(files, pkg.XTestGoFiles...)
 	if pkg.Dir != "." {
 		for i, f := range files {
 			files[i] = filepath.Join(pkg.Dir, f)

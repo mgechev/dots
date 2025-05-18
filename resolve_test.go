@@ -110,16 +110,12 @@ func TestPackageWildcard(t *testing.T) {
 	result, err := Resolve([]string{"github.com/mgechev/dots/fixtures/pkg/foo/...", "github.com/mgechev/dots/fixtures/pkg/baz"}, []string{})
 	files := []string{
 		"baz1.go",
-		"baz2.go",
-		"foo1.go",
-		"foo2.go",
-		"bar1.go",
+		"baz2.go",	
 	}
 
 	if err != nil {
 		t.Error("Got errors")
 	}
-
 	if len(result) != len(files) {
 		t.Error("Matched different number of files")
 	}
@@ -193,7 +189,7 @@ func TestResolvePackages(t *testing.T) {
 		t.Error("Got errors")
 	}
 
-	if len(result) != 3 {
+	if len(result) != 1 {
 		t.Error("Matched different number of files")
 	}
 

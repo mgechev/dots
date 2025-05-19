@@ -1,0 +1,50 @@
+name: Checks
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  go-checks:
+    name: Go checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: stable
+
+      - name: Check go.mod
+        run: |
+          go mod tidy
+          git diff --exit-code go.mod
+          git diff --exit-code go.sum
+
+      - name: Run gofmt
+        run: |
+          find . -type f -name '*.go' -not -path './fixtures/*' -exec gofmt -w {} +
+          git diff --exit-code
+
+  tests:
+    name: Tests
+    strategy:
+      fail-fast: false
+      matrix:
+        go-version:
+          - oldstable
+          - stable
+        os:
+          - ubuntu-latest
+          - windows-latest
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go-version }}
+
+      - name: Run tests
+        run: go test -race -shuffle=on ./...

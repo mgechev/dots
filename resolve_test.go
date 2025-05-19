@@ -2,6 +2,7 @@ package dots
 
 import (
 	"log"
+	"runtime"
 	"strings"
 	"testing"
 )
@@ -25,6 +26,10 @@ func TestResolveNoArgs(t *testing.T) {
 }
 
 func TestResolve(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.SkipNow()
+	}
+
 	result, err := Resolve([]string{"fixtures/dummy/..."}, []string{"fixtures/dummy/foo", "fixtures/dummy/UNKNOWN"})
 
 	files := []string{

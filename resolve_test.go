@@ -110,7 +110,7 @@ func TestPackageWildcard(t *testing.T) {
 	result, err := Resolve([]string{"github.com/mgechev/dots/fixtures/pkg/foo/...", "github.com/mgechev/dots/fixtures/pkg/baz"}, []string{})
 	files := []string{
 		"baz1.go",
-		"baz2.go",	
+		"baz2.go",
 	}
 
 	if err != nil {

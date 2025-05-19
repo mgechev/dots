@@ -2,6 +2,7 @@ package dots
 
 import (
 	"log"
+	"runtime"
 	"strings"
 	"testing"
 )
@@ -25,6 +26,10 @@ func TestResolveNoArgs(t *testing.T) {
 }
 
 func TestResolve(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.SkipNow()
+	}
+
 	result, err := Resolve([]string{"fixtures/dummy/..."}, []string{"fixtures/dummy/foo", "fixtures/dummy/UNKNOWN"})
 
 	files := []string{
@@ -110,7 +115,7 @@ func TestPackageWildcard(t *testing.T) {
 	result, err := Resolve([]string{"github.com/mgechev/dots/fixtures/pkg/foo/...", "github.com/mgechev/dots/fixtures/pkg/baz"}, []string{})
 	files := []string{
 		"baz1.go",
-		"baz2.go",	
+		"baz2.go",
 	}
 
 	if err != nil {

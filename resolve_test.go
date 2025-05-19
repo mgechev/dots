@@ -1,7 +1,6 @@
 package dots
 
 import (
-	"log"
 	"runtime"
 	"strings"
 	"testing"
@@ -9,19 +8,11 @@ import (
 
 func TestResolveNoArgs(t *testing.T) {
 	result, err := Resolve([]string{}, []string{})
-
-	files := []string{}
-
 	if err != nil {
-		t.Error("Got errors")
+		t.Fatal(err)
 	}
-
-	if len(result) != len(files) {
-		t.Error("Matched different number of files")
-	}
-
-	if err != nil {
-		log.Fatal(err)
+	if len(result) != 0 {
+		t.Errorf("Matched different number of files: got=%v, want=0", len(result))
 	}
 }
 
@@ -41,24 +32,18 @@ func TestResolve(t *testing.T) {
 	}
 
 	if err != nil {
-		t.Error("Got errors")
+		t.Fatal(err)
 	}
-
 	if len(result) != len(files) {
-		t.Error("Matched different number of files")
+		t.Fatalf("Matched different number of files: got=%v, want=%v", len(result), len(files))
 	}
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	for _, r := range result {
 		matched := false
 		for _, e := range files {
 			matched = matched || strings.HasSuffix(r, e)
 		}
 		if !matched {
-			t.Error("Not supposed to match: " + r)
+			t.Errorf("Not supposed to match: %v", r)
 		}
 	}
 }
@@ -71,24 +56,18 @@ func TestPackageResolve(t *testing.T) {
 	}
 
 	if err != nil {
-		t.Error("Got errors")
+		t.Fatal(err)
 	}
-
 	if len(result) != len(files) {
-		t.Error("Matched different number of files")
+		t.Fatalf("Matched different number of files: got=%v, want=%v", len(result), len(files))
 	}
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	for _, r := range result {
 		matched := false
 		for _, e := range files {
 			matched = matched || strings.HasSuffix(r, e)
 		}
 		if !matched {
-			t.Error("Not supposed to match: " + r)
+			t.Errorf("Not supposed to match: %v", r)
 		}
 	}
 }
@@ -99,15 +78,10 @@ func TestSkipWildcard(t *testing.T) {
 	files := map[string]bool{}
 
 	if err != nil {
-		t.Error("Got errors")
+		t.Fatal(err)
 	}
-
 	if len(result) != len(files) {
-		t.Error("Matched different number of files")
-	}
-
-	if err != nil {
-		log.Fatal(err)
+		t.Fatalf("Matched different number of files: got=%v, want=%v", len(result), len(files))
 	}
 }
 
@@ -119,23 +93,18 @@ func TestPackageWildcard(t *testing.T) {
 	}
 
 	if err != nil {
-		t.Error("Got errors")
+		t.Fatal(err)
 	}
 	if len(result) != len(files) {
-		t.Error("Matched different number of files")
+		t.Fatalf("Matched different number of files: got=%v, want=%v", len(result), len(files))
 	}
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	for _, r := range result {
 		matched := false
 		for _, e := range files {
 			matched = matched || strings.HasSuffix(r, e)
 		}
 		if !matched {
-			t.Error("Not supposed to match: " + r)
+			t.Errorf("Not supposed to match: %v", r)
 		}
 	}
 }
@@ -149,24 +118,18 @@ func TestPackageWildcardWithSkip(t *testing.T) {
 	}
 
 	if err != nil {
-		t.Error("Got errors")
+		t.Fatal(err)
 	}
-
 	if len(result) != len(files) {
-		t.Error("Matched different number of files")
+		t.Fatalf("Matched different number of files: got=%v, want=%v", len(result), len(files))
 	}
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	for _, r := range result {
 		matched := false
 		for _, e := range files {
 			matched = matched || strings.HasSuffix(r, e)
 		}
 		if !matched {
-			t.Error("Not supposed to match: " + r)
+			t.Errorf("Not supposed to match: %v", r)
 		}
 	}
 }
@@ -189,19 +152,15 @@ func TestComplainForMissingPackages(t *testing.T) {
 
 func TestResolvePackages(t *testing.T) {
 	result, err := ResolvePackages([]string{"github.com/mgechev/dots/fixtures/pkg/foo/...", "github.com/mgechev/dots/fixtures/pkg/baz"}, []string{})
-
 	if err != nil {
-		t.Error("Got errors")
+		t.Fatal(err)
 	}
-
 	if len(result) != 1 {
-		t.Error("Matched different number of files")
+		t.Fatalf("Matched different number of files: got=%v, want=%v", len(result), 1)
 	}
-
 	for _, pkg := range result {
 		if len(pkg) == 0 {
 			t.Error("Empty package")
 		}
 	}
-
 }

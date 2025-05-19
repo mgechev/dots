@@ -1,7 +1,7 @@
 package dots
 
 import (
-	"runtime"
+	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -17,18 +17,40 @@ func TestResolveNoArgs(t *testing.T) {
 }
 
 func TestResolve(t *testing.T) {
-	if runtime.GOOS == "windows" {
-		t.SkipNow()
-	}
-
 	result, err := Resolve([]string{"fixtures/dummy/..."}, []string{"fixtures/dummy/foo", "fixtures/dummy/UNKNOWN"})
 
 	files := []string{
-		"fixtures/dummy/bar/bar1.go",
-		"fixtures/dummy/bar/bar2.go",
-		"fixtures/dummy/baz/baz1.go",
-		"fixtures/dummy/baz/baz2.go",
-		"fixtures/dummy/baz/baz3.go",
+		filepath.FromSlash("fixtures/dummy/bar/bar1.go"),
+		filepath.FromSlash("fixtures/dummy/bar/bar2.go"),
+		filepath.FromSlash("fixtures/dummy/baz/baz1.go"),
+		filepath.FromSlash("fixtures/dummy/baz/baz2.go"),
+		filepath.FromSlash("fixtures/dummy/baz/baz3.go"),
+	}
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(result) != len(files) {
+		t.Fatalf("Matched different number of files: got=%v, want=%v", len(result), len(files))
+	}
+	for _, r := range result {
+		matched := false
+		for _, e := range files {
+			matched = matched || strings.HasSuffix(r, e)
+		}
+		if !matched {
+			t.Errorf("Not supposed to match: %v", r)
+		}
+	}
+}
+
+func TestResolveTests(t *testing.T) {
+	result, err := Resolve([]string{"fixtures/withtests/..."}, []string{})
+
+	files := []string{
+		filepath.FromSlash("fixtures/withtests/gofile.go"),
+		filepath.FromSlash("fixtures/withtests/testgo_test.go"),
+		filepath.FromSlash("fixtures/withtests/xtestgo_test.go"),
 	}
 
 	if err != nil {

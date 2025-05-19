@@ -1,19 +1,25 @@
-[![Build Status](https://travis-ci.org/mgechev/dots.svg?branch=master)](https://travis-ci.org/mgechev/dots)
-
 # Dots
 
-Implements the wildcard file matching in Go used by golint, go test etc.
+[![Build Status](https://github.com/mgechev/dots/actions/workflows/pr.yaml/badge.svg)](https://github.com/mgechev/dots/actions/workflows/pr.yaml)
+[![Go Reference](https://pkg.go.dev/badge/github.com/mgechev/dots.svg)](https://pkg.go.dev/github.com/mgechev/dots)
+
+`dots` is a Go package that provides advanced wildcard file and package matching, similar to the behavior used by tools like `go test` and `golint`.
+It allows you to easily resolve file paths and packages using patterns with `...` wildcards, and supports flexible exclusion rules.
 
 ## Usage
 
 ```go
-import "github.com/mgechev/dots"
+import (
+	"fmt"
+
+	"github.com/mgechev/dots"
+)
 
 func main() {
-  result, err := dots.Resolve([]string{"./fixtures/..."}, []string{"./fixtures/foo"})
-  for _, f := range result {
-    fmt.Println(f);
-  }
+	result, err := dots.Resolve([]string{"./fixtures/..."}, []string{"./fixtures/foo"})
+	for _, f := range result {
+		fmt.Println(f);
+	}
 }
 ```
 
@@ -94,7 +100,3 @@ So we will get the result:
 ```
 
 This method is especially useful, when you want to perform type checking over given package from the result.
-
-## License
-
-MIT

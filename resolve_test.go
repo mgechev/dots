@@ -2,7 +2,6 @@ package dots
 
 import (
 	"path/filepath"
-	"runtime"
 	"strings"
 	"testing"
 )
@@ -18,18 +17,14 @@ func TestResolveNoArgs(t *testing.T) {
 }
 
 func TestResolve(t *testing.T) {
-	if runtime.GOOS == "windows" {
-		t.SkipNow()
-	}
-
 	result, err := Resolve([]string{"fixtures/dummy/..."}, []string{"fixtures/dummy/foo", "fixtures/dummy/UNKNOWN"})
 
 	files := []string{
-		"fixtures/dummy/bar/bar1.go",
-		"fixtures/dummy/bar/bar2.go",
-		"fixtures/dummy/baz/baz1.go",
-		"fixtures/dummy/baz/baz2.go",
-		"fixtures/dummy/baz/baz3.go",
+		filepath.FromSlash("fixtures/dummy/bar/bar1.go"),
+		filepath.FromSlash("fixtures/dummy/bar/bar2.go"),
+		filepath.FromSlash("fixtures/dummy/baz/baz1.go"),
+		filepath.FromSlash("fixtures/dummy/baz/baz2.go"),
+		filepath.FromSlash("fixtures/dummy/baz/baz3.go"),
 	}
 
 	if err != nil {

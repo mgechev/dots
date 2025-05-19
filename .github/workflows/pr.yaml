@@ -19,8 +19,8 @@ jobs:
       - name: Check go.mod
         run: |
           go mod tidy
-          git diff --exit-code go.mod
-          git diff --exit-code go.sum
+          git diff --exit-code -- go.mod
+          git diff --exit-code -- go.sum
 
       - name: Run gofmt
         run: |

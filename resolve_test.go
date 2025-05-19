@@ -1,6 +1,7 @@
 package dots
 
 import (
+	"path/filepath"
 	"runtime"
 	"strings"
 	"testing"
@@ -29,6 +30,32 @@ func TestResolve(t *testing.T) {
 		"fixtures/dummy/baz/baz1.go",
 		"fixtures/dummy/baz/baz2.go",
 		"fixtures/dummy/baz/baz3.go",
+	}
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(result) != len(files) {
+		t.Fatalf("Matched different number of files: got=%v, want=%v", len(result), len(files))
+	}
+	for _, r := range result {
+		matched := false
+		for _, e := range files {
+			matched = matched || strings.HasSuffix(r, e)
+		}
+		if !matched {
+			t.Errorf("Not supposed to match: %v", r)
+		}
+	}
+}
+
+func TestResolveTests(t *testing.T) {
+	result, err := Resolve([]string{"fixtures/withtests/..."}, []string{})
+
+	files := []string{
+		filepath.FromSlash("fixtures/withtests/gofile.go"),
+		filepath.FromSlash("fixtures/withtests/testgo_test.go"),
+		filepath.FromSlash("fixtures/withtests/xtestgo_test.go"),
 	}
 
 	if err != nil {
